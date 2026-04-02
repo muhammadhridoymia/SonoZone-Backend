@@ -2,7 +2,13 @@ const mongoose = require("mongoose");
 
 const storySchema = new mongoose.Schema(
   {
-    category: String, // VERY IMPORTANT
+    isTop: {
+      allTime: { type: Boolean, default: false },
+      week: { type: Boolean, default: false },
+      month: { type: Boolean, default: false },
+      year: { type: Boolean, default: false },
+    },
+    category: String, 
     tags: [String],
     audio: {
       english: {

@@ -3,7 +3,6 @@ const router = express.Router();
 const { upload } = require("../middleware/upload");
 const { createStory } = require("../controller/storyController");
 // Get all published stories
-const { getAllStories } = require("../controller/getStoryforUsers");
 const { getTopStories } = require("../controller/GetTopsStoriesforusers");
 const { getStoryAudio } = require("../controller/GetAudiosForUsers");
 const { getStoryText } = require("../controller/GetStoryText");

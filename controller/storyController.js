@@ -55,10 +55,11 @@ exports.createStory = async (req, res) => {
   try {
     const {
       title,
+      category,
+      tags = [],
       englishText = "",
       banglaText,
       writerName,
-      writerId,
       audioEnLength = 0,
       audioBnLength = 0,
       isPublished = true,
@@ -99,6 +100,8 @@ exports.createStory = async (req, res) => {
     // 🔹 Create story
     const newStory = new Story({
       title,
+      category,
+      tags: Array.isArray(tags) ? tags : [tags],
       storyText: {
         english: englishText,
         bangla: banglaText,
@@ -119,6 +122,7 @@ exports.createStory = async (req, res) => {
       },
       isPublished: isPublished === "false" ? false : true,
     });
+    console.log("🚀 New Story Object:", newStory);
 
     await newStory.save();
 

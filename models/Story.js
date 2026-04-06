@@ -8,8 +8,10 @@ const storySchema = new mongoose.Schema(
       month: { type: Boolean, default: false },
       year: { type: Boolean, default: false },
     },
+
     category: String, 
     tags: [String],
+    
     audio: {
       english: {
         url: String,

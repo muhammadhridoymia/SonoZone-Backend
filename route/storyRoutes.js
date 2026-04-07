@@ -6,6 +6,9 @@ const { createStory } = require("../controller/storyController");
 const { getTopStories } = require("../controller/GetTopsStoriesforusers");
 const { getStoryAudio } = require("../controller/GetAudiosForUsers");
 const { getStoryText } = require("../controller/GetStoryText");
+const { MostSearchStory } = require("../controller/getMostSearch");
+
+router.get("/most/searched", MostSearchStory);
 
 router.get("/all/tops/:period", getTopStories);
 router.get("/audio/:id", getStoryAudio);

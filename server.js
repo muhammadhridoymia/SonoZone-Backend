@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const storyRoutes = require("./route/storyRoutes");
 const adminStoryRoutes = require("./AdminRoutes/Allstories");
 const LinesRoutes = require("./route/LinesRoutes");
+const GoogleAuthRoutes = require("./models/GoogleAuth");
 const cors = require("cors");
 
 const app = express();
@@ -25,6 +26,9 @@ app.use("/api/lines", LinesRoutes);
 
 // Admin routes
 app.use("/api/admin/stories", adminStoryRoutes);
+
+// Google Auth routes
+app.use("/auth", GoogleAuthRoutes);
 
 
 app.listen(5000, () => {

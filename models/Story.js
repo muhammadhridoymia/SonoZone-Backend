@@ -49,6 +49,7 @@ const storySchema = new mongoose.Schema(
     stats: {
       views: { type: Number, default: 0 },
       likes: { type: Number, default: 0 },
+      comments: { type: Number, default: 0 },
     },
 
     isPublished: {

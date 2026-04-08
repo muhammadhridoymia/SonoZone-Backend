@@ -1,24 +1,81 @@
 const Story = require("../models/Story");
+const Like = require("../models/Likes");
+const Comment = require("../models/Comments");
+const View = require("../models/Views");
 
-// Update story status
 const updateStatus = async (req, res) => {
   try {
-    const { id } = req.params; 
-    const { type } = req.body;  //type can be "likes", "comments", "views"
+    const { StoryId } = req.params;
+    const { type, UserId, CommentText } = req.body;
 
-    const story = await Story.findById(id);
-
-    if (!story) {
-      return res.status(404).json({ success: false, message: "Story not found" });
+    if (!StoryId || !type || !UserId) {
+      return res.status(400).json({ message: "Missing required fields" });
     }
 
-    story.status = ;
-    await story.save();
+    if (!["likes", "comments", "views"].includes(type)) {
+      return res.status(400).json({ message: "Invalid type" });
+    }
 
-    res.json({ success: true, message: "Story status updated successfully" });
+    //LIKE 
+    if (type === "likes") {
+      const existingLike = await Like.findOne({ userId: UserId, storyId: StoryId });
+
+      if (existingLike) {
+        await Like.deleteOne({ _id: existingLike._id });
+
+        await Story.findByIdAndUpdate(StoryId, {
+          $inc: { "stats.likes": -1 },
+        });
+
+        return res.json({ message: "Unliked" });
+      }
+
+      await Like.create({ userId: UserId, storyId: StoryId });
+
+      await Story.findByIdAndUpdate(StoryId, {
+        $inc: { "stats.likes": 1 },
+      });
+
+      return res.json({ message: "Liked" });
+    }
+
+    //COMMENT
+    if (type === "comments") {
+      if (!CommentText || CommentText.trim() === "") {
+        return res.status(400).json({ message: "Comment required" });
+      }
+
+      await Comment.create({
+        userId: UserId,
+        storyId: StoryId,
+        text: CommentText,
+      });
+
+      await Story.findByIdAndUpdate(StoryId, {
+        $inc: { "stats.comments": 1 },
+      });
+
+      return res.json({ message: "Comment added" });
+    }
+
+    //VIEW
+    if (type === "views") {
+      const existingView = await View.findOne({ userId: UserId, storyId: StoryId });
+
+      if (!existingView) {
+        await View.create({ userId: UserId, storyId: StoryId });
+
+        await Story.findByIdAndUpdate(StoryId, {
+          $inc: { "stats.views": 1 },
+        });
+      }
+
+      return res.json({ message: "View counted" });
+    }
+
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ success: false, message: "Server error" });
+    console.error("Error updating story status:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 

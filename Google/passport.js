@@ -23,6 +23,15 @@ passport.use(
             email: profile.emails[0].value,
             avatar: profile.photos[0].value,
           });
+        } else {
+          // login existing user
+
+          // Generate JWT token
+          const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+            expiresIn: "7d",
+          });
+          done(null, { user, token });
+          return;
         }
 
         console.log("Authenticated user:", user);
@@ -36,6 +45,6 @@ passport.use(
       } catch (err) {
         done(err, null);
       }
-    }
-  )
+    },
+  ),
 );

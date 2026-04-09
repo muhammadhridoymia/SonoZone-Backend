@@ -1,3 +1,4 @@
+// config/passport.js
 const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const User = require("../models/User");
@@ -8,43 +9,36 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: "/auth/google/callback",
+      callbackURL: "http://localhost:5000/auth/google/callback", // Full URL
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        // Check if user exists
         let user = await User.findOne({ googleId: profile.id });
 
         if (!user) {
-          // Create new user automatically
+          // Register new user
           user = await User.create({
             googleId: profile.id,
             name: profile.displayName,
             email: profile.emails[0].value,
-            avatar: profile.photos[0].value,
+            avatar: profile.photos?.[0]?.value || "",
+            isVerified: true, // Google users are considered verified
           });
-        } else {
-          // login existing user
-
-          // Generate JWT token
-          const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-            expiresIn: "7d",
-          });
-          done(null, { user, token });
-          return;
         }
 
-        console.log("Authenticated user:", user);
-
-        // Generate JWT token
-        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-          expiresIn: "7d",
-        });
+        // Generate JWT Token
+        const token = jwt.sign(
+          { id: user._id, email: user.email },
+          process.env.JWT_SECRET,
+          { expiresIn: "30d" }   // ← Changed to 30 days for "never need to login"
+        );
 
         done(null, { user, token });
       } catch (err) {
         done(err, null);
       }
-    },
-  ),
+    }
+  )
 );
+
+module.exports = passport;

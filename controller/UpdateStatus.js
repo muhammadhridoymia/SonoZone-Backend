@@ -1,3 +1,4 @@
+const jwt = require("jsonwebtoken");
 const Story = require("../models/Story");
 const Like = require("../models/Likes");
 const Comment = require("../models/Comments");
@@ -5,77 +6,103 @@ const View = require("../models/Views");
 
 const updateStatus = async (req, res) => {
   try {
-    const { StoryId } = req.params;
-    const { type, UserId, CommentText } = req.body;
+    const { storyId } = req.params;
+    const { type, commentText } = req.body;
+    const userId = req.user.id;
 
-    if (!StoryId || !type || !UserId) {
-      return res.status(400).json({ message: "Missing required fields" });
+    if (!storyId || !type) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing required fields",
+      });
     }
 
     if (!["likes", "comments", "views"].includes(type)) {
-      return res.status(400).json({ message: "Invalid type" });
+      return res.status(400).json({
+        success: false,
+        message: "Invalid type",
+      });
     }
 
-    //LIKE 
+    // ================= LIKE =================
     if (type === "likes") {
-      const existingLike = await Like.findOne({ userId: UserId, storyId: StoryId });
+      const existingLike = await Like.findOne({ userId, storyId });
 
       if (existingLike) {
         await Like.deleteOne({ _id: existingLike._id });
 
-        await Story.findByIdAndUpdate(StoryId, {
+        await Story.findByIdAndUpdate(storyId, {
           $inc: { "stats.likes": -1 },
         });
 
-        return res.json({ message: "Unliked" });
+        return res.json({
+          success: true,
+          message: "Unliked",
+        });
       }
 
-      await Like.create({ userId: UserId, storyId: StoryId });
+      await Like.create({ userId, storyId });
 
-      await Story.findByIdAndUpdate(StoryId, {
+      await Story.findByIdAndUpdate(storyId, {
         $inc: { "stats.likes": 1 },
       });
 
-      return res.json({ message: "Liked" });
+      return res.json({
+        success: true,
+        message: "Liked",
+      });
     }
 
-    //COMMENT
+    // ================= COMMENT =================
     if (type === "comments") {
-      if (!CommentText || CommentText.trim() === "") {
-        return res.status(400).json({ message: "Comment required" });
+      if (!commentText || commentText.trim() === "") {
+        return res.status(400).json({
+          success: false,
+          message: "Comment required",
+        });
       }
 
       await Comment.create({
-        userId: UserId,
-        storyId: StoryId,
-        text: CommentText,
+        userId,
+        storyId,
+        text: commentText,
       });
 
-      await Story.findByIdAndUpdate(StoryId, {
+      await Story.findByIdAndUpdate(storyId, {
         $inc: { "stats.comments": 1 },
       });
 
-      return res.json({ message: "Comment added" });
+      return res.json({
+        success: true,
+        message: "Comment added",
+      });
     }
 
-    //VIEW
+    // ================= VIEW =================
     if (type === "views") {
-      const existingView = await View.findOne({ userId: UserId, storyId: StoryId });
+      const existingView = await View.findOne({ userId, storyId });
 
       if (!existingView) {
-        await View.create({ userId: UserId, storyId: StoryId });
+        await View.create({ userId, storyId });
 
-        await Story.findByIdAndUpdate(StoryId, {
+        await Story.findByIdAndUpdate(storyId, {
           $inc: { "stats.views": 1 },
         });
       }
 
-      return res.json({ message: "View counted" });
+      return res.json({
+        success: true,
+        message: "View counted",
+      });
     }
 
   } catch (error) {
     console.error("Error updating story status:", error);
-    res.status(500).json({ message: "Internal server error" });
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
   }
 };
 

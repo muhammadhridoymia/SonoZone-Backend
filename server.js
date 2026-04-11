@@ -21,6 +21,8 @@ app.get("/", (req, res) => {res.send("API is running...");});
 
 //User routes
 app.use("/api/stories", storyRoutes);
+
+//Lines routes
 app.use("/api/lines", LinesRoutes);
 
 

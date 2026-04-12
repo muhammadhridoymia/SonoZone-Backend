@@ -31,7 +31,7 @@ const getStoryAudio = async (req, res) => {
       title: story.title,
       imageUrl: story.imageUrl,
       writer: story.writer?.name || "Unknown",
-      isLiked, // ✅ clean
+      isLiked, // clean
     };
 
     console.log("audio data is : " ,storyData)

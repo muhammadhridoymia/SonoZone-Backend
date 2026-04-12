@@ -24,7 +24,7 @@ const updateStatus = async (req, res) => {
       });
     }
 
-    // ================= LIKE =================
+    // LIKE 
     if (type === "likes") {
       const existingLike = await Like.findOne({ userId, storyId });
 
@@ -53,7 +53,7 @@ const updateStatus = async (req, res) => {
       });
     }
 
-    // ================= COMMENT =================
+    // COMMENT
     if (type === "comments") {
       if (!commentText || commentText.trim() === "") {
         return res.status(400).json({
@@ -78,7 +78,7 @@ const updateStatus = async (req, res) => {
       });
     }
 
-    // ================= VIEW =================
+    // VIEW
     if (type === "views") {
       const existingView = await View.findOne({ userId, storyId });
 

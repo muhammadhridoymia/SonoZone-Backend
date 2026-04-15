@@ -47,7 +47,8 @@ export const register = async (req, res) => {
       // You can add more fields like role, isVerified, etc.
     });
 
-    await newUser.save();
+    console.log('New user object before saving:', newUser);
+    // await newUser.save();
 
     // Generate JWT token
     const token = jwt.sign(
@@ -59,12 +60,8 @@ export const register = async (req, res) => {
     // Send response (never send password back)
     res.status(201).json({
       success: true,
-      message: 'User registered successfully',
       user: {
-        id: newUser._id,
         fullName: newUser.fullName,
-        email: newUser.email,
-        phone: newUser.phone,
       },
       token
     });

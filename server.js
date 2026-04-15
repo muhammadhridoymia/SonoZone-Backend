@@ -6,6 +6,7 @@ const adminStoryRoutes = require("./AdminRoutes/Allstories");
 const LinesRoutes = require("./route/LinesRoutes");
 const GoogleAuthRoutes = require("./models/GoogleAuth");
 const RecommendStoryRoute =require ("./route/RecommendStoryRoute")
+const RegistrationRoute = require("./route/RegistrationRoute");
 const cors = require("cors");
 
 const app = express();
@@ -36,7 +37,8 @@ app.use("/auth", GoogleAuthRoutes);
 //Recommendation Routes
 app.use("/api/stories",RecommendStoryRoute)
 
-
+// Registration Route
+app.use("/api/auth", RegistrationRoute);
 
 app.listen(5000, () => {
   console.log("Server running on port 5000");

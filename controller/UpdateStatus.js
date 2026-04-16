@@ -8,7 +8,8 @@ const updateStatus = async (req, res) => {
   try {
     const { storyId } = req.params;
     const { type, commentText } = req.body;
-    const userId = req.user.id;
+    const userId = req.user.userId;
+    console.log("User ID:", userId);
 
     if (!storyId || !type) {
       return res.status(400).json({

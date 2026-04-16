@@ -6,7 +6,9 @@ const userSchema = new mongoose.Schema({
   email: String,
   googleId: String,  // For Google login
   avatar: String,
-  phone: String,     // Optional for phone login later
+  phone: String,
+  password: String,
+  // Optional for phone login later
 }, { timestamps: true });
 
 module.exports = mongoose.model("ShonoUser", userSchema);

@@ -19,9 +19,10 @@ const getStoryAudio = async (req, res) => {
 
     if (req.user) {
       const existingLike = await Likes.findOne({
-        userId: req.user.id,
+        userId: req.user.userId,
         storyId: id,
       });
+      console.log("Existing like: userId and storyId", req.user.userId, id, existingLike);
 
       isLiked = !!existingLike;
     }

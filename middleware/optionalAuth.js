@@ -8,6 +8,7 @@ const optionalAuth = (req, res, next) => {
     if (token) {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       req.user = decoded;
+      console.log("Decoded user:", req.user);
     }
 
     next();

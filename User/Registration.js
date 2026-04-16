@@ -48,7 +48,7 @@ export const register = async (req, res) => {
     });
 
     console.log('New user object before saving:', newUser);
-    // await newUser.save();
+    await newUser.save();
 
     // Generate JWT token
     const token = jwt.sign(
@@ -61,7 +61,7 @@ export const register = async (req, res) => {
     res.status(201).json({
       success: true,
       user: {
-        fullName: newUser.fullName,
+        name: newUser.name,
       },
       token
     });

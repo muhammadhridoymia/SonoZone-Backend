@@ -13,7 +13,7 @@ const optionalAuth = (req, res, next) => {
 
     next();
   } catch {
-    next(); // ignore error
+    next();
   }
 };
 

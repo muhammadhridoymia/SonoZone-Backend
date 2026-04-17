@@ -36,7 +36,7 @@ exports.createLine = async (req, res) => {
       });
     }
 
-    // 🔹 Parse tags (VERY IMPORTANT)
+    // 🔹 Parse tags
     let parsedTags = [];
 
     if (typeof tags === "string") {
@@ -56,7 +56,7 @@ exports.createLine = async (req, res) => {
     // 🔹 Upload in parallel
     const [imageUrl, audioUrl] = await Promise.all([
       uploadToCloudinary(imageFile, "lines/images", "image"),
-      uploadToCloudinary(audioFile, "lines/audios", "video"), // audio = video
+      uploadToCloudinary(audioFile, "lines/audios", "video"),
     ]);
 
     // 🔹 Create line

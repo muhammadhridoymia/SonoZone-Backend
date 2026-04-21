@@ -59,9 +59,11 @@ exports.createStory = async (req, res) => {
       tags = [],
       englishText = "",
       banglaText,
+      arabicText = "",
       writerName,
       audioEnLength = 0,
       audioBnLength = 0,
+      audioArLength = 0,
       isPublished = true,
     } = req.body;
 
@@ -77,12 +79,14 @@ exports.createStory = async (req, res) => {
     const imageFile = req.files?.image?.[0];
     const audioEnFile = req.files?.audioEn?.[0];
     const audioBnFile = req.files?.audioBn?.[0];
+    const audioArFile = req.files?.audioAr?.[0]; // New Arabic audio file
 
     // ✅ File validation
     const validations = [
       validateFile(imageFile, "image"),
       validateFile(audioEnFile, "audio"),
       validateFile(audioBnFile, "audio"),
+      validateFile(audioArFile, "audio"), // Validate Arabic audio
     ];
 
     const invalid = validations.find(v => !v.valid);
@@ -91,10 +95,11 @@ exports.createStory = async (req, res) => {
     }
 
     // ⚡ Parallel upload (VERY IMPORTANT)
-    const [imageUrl, audioEnUrl, audioBnUrl] = await Promise.all([
+    const [imageUrl, audioEnUrl, audioBnUrl, audioArUrl] = await Promise.all([
       uploadToCloudinary(imageFile, "stories/images", "image"),
       uploadToCloudinary(audioEnFile, "stories/audios", "video"),
       uploadToCloudinary(audioBnFile, "stories/audios", "video"),
+      uploadToCloudinary(audioArFile, "stories/audios", "video"), // Upload Arabic audio
     ]);
 
     // 🔹 Create story
@@ -105,6 +110,7 @@ exports.createStory = async (req, res) => {
       storyText: {
         english: englishText,
         bangla: banglaText,
+        arabic: arabicText, // You can add Arabic text if needed
       },
       imageUrl,
       audio: {
@@ -115,6 +121,10 @@ exports.createStory = async (req, res) => {
         bangla: {
           url: audioBnUrl,
           length: Number(audioBnLength) || 0,
+        },
+        arabic: {
+          url: audioArUrl,
+          length: Number(audioArLength) || 0, // You can add length for Arabic audio if needed
         },
       },
       writer: {

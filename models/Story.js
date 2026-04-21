@@ -21,6 +21,10 @@ const storySchema = new mongoose.Schema(
         url: String,
         length: Number,
       },
+      arabic: {
+        url: String,
+        length: Number,
+      },
     },
     title: {
       type: String,
@@ -35,6 +39,9 @@ const storySchema = new mongoose.Schema(
       bangla: {
         type: String,
         required: true,
+      },
+      arabic: {
+        type: String,
       },
     },
 

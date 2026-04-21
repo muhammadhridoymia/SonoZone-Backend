@@ -19,6 +19,6 @@ router.get("/most/searched", MostSearchStory);
 router.get("/all/tops/:period", getTopStories);
 router.get("/audio/:id",optionalAuth,getStoryAudio);
 router.get("/text/:id", getStoryText);
-router.post("/create",upload.fields([{ name: "image", maxCount: 1 },{ name: "audioEn", maxCount: 1 },{ name: "audioBn", maxCount: 1 },]),createStory,);
+router.post("/create",upload.fields([{ name: "image", maxCount: 1 },{ name: "audioEn", maxCount: 1 },{ name: "audioBn", maxCount: 1 },{ name: "audioAr", maxCount: 1 }]),createStory,);
 
 module.exports = router;

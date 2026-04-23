@@ -5,18 +5,23 @@ const Searchapi = async (req, res) => {
     const { query } = req.query;
 
     if (!query || query.trim() === "") {
-      return res.status(400).json({ success: false, message: "Query parameter is required" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Query parameter is required" });
     }
 
     // Search for stories matching the query in title, tags, or category
     const searchResults = await Story.find({
       isPublished: true,
       $or: [
-        { title: { $regex: query, $options: "i" } }, // case-insensitive search in title
-        { tags: { $regex: query, $options: "i" } }, // case-insensitive search in tags
-        { category: { $regex: query, $options: "i" } }, // case-insensitive search in category
+        { title: { $regex: query, $options: "i" } },
+        { tags: { $regex: query, $options: "i" } },
+        { category: { $regex: query, $options: "i" } },
+        { "writer.name": { $regex: query, $options: "i" } },
       ],
-    }).select("_id title imageUrl audio.bangla.length stats writer.name");
+    })
+      .select("_id title imageUrl audio.bangla.length stats writer.name")
+      .sort({ "stats.likes": -1, "stats.views": -1 }); // sort by popularity
 
     // Map results to desired format
     const formattedResults = searchResults.map((story) => ({

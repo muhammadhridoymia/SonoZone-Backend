@@ -9,6 +9,6 @@ const commentSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
-const Comment = mongoose.model('Comment', commentSchema);
+const Comment = mongoose.model('sonozoneComment', commentSchema);
 
 module.exports = Comment;

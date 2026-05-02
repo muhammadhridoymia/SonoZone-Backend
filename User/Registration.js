@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 export const register = async (req, res) => {
   try {
     const { name,email, phone, password, } = req.body;
+    console.log('Registration request body:', req.body);
 
     // Validation
     if (!password) {
@@ -57,7 +58,7 @@ export const register = async (req, res) => {
       { expiresIn: '7d' }
     );
 
-    // Send response (never send password back)
+    // Send response with user info and token
     res.status(201).json({
       success: true,
       user: {

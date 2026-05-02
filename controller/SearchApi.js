@@ -3,6 +3,7 @@ const Story = require("../models/Story");
 const Searchapi = async (req, res) => {
   try {
     const { query } = req.query;
+    console.log("Search query:", query);
 
     if (!query || query.trim() === "") {
       return res
@@ -34,6 +35,7 @@ const Searchapi = async (req, res) => {
     }));
 
     res.json({ success: true, data: formattedResults });
+    console.log("Search results:", formattedResults);
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, message: "Server Error" });

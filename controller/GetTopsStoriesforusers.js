@@ -5,6 +5,7 @@ exports.getTopStories = async (req, res) => {
   try {
     const { period } = req.params; // allTime, year, month, week
     const limit = 10
+    console.log("Fetching top stories for period:", period);
 
     // Validate period
     const validPeriods = ['allTime', 'year', 'month', 'week'];

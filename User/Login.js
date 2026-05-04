@@ -10,19 +10,18 @@ export const login = async (req, res) => {
 
     // Validation
     if (!password) {
-      return res.status(400).json({ 
+      return res.status(201).json({ 
         success: false,
         message: 'Password is required' 
       });
     }
 
     if (!email && !phone) {
-      return res.status(400).json({ 
+      return res.status(201).json({ 
         success: false,
         message: 'Either email or phone number is required' 
       });
     }
-
     // Find user by email or phone
     let user;
     
@@ -34,9 +33,10 @@ export const login = async (req, res) => {
 
     // Check if user exists
     if (!user) {
-      return res.status(401).json({ 
+      console.log('User not found with email or phone:', email || phone);
+      return res.status(201).json({ 
         success: false,
-        message: 'Invalid credentials' 
+        message: 'User not found! try valid credentials or Register.' 
       });
     }
 
@@ -44,7 +44,7 @@ export const login = async (req, res) => {
     const isPasswordValid = await bcrypt.compare(password, user.password);
     
     if (!isPasswordValid) {
-      return res.status(401).json({ 
+      return res.status(201).json({ 
         success: false,
         message: 'Invalid credentials' 
       });

@@ -1,6 +1,7 @@
 import User from '../models/User.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { sendEmail } from '../utils/SendEmail.js';
 
 
 export const login = async (req, res) => {
@@ -31,7 +32,7 @@ export const login = async (req, res) => {
       user = await User.findOne({ phone });
     }
 
-    // Check if user exists
+    // Check if user exists 
     if (!user) {
       console.log('User not found with email or phone:', email || phone);
       return res.status(201).json({ 
@@ -46,33 +47,25 @@ export const login = async (req, res) => {
     if (!isPasswordValid) {
       return res.status(201).json({ 
         success: false,
-        message: 'Invalid credentials' 
+        message: 'Wrong password!' 
       });
     }
 
     // Generate JWT token
-    const token = jwt.sign(
-      { 
-        userId: user._id,
-        email: user.email,
-        phone: user.phone
-      }, 
-      process.env.JWT_SECRET, 
-      { expiresIn: '7d' }
-    );
+       const token = jwt.sign({ userId: user._id,  email: user.email, phone: user.phone}, process.env.JWT_SECRET, { expiresIn: '7d' });
 
-    // Send response with user info and token
-    res.status(200).json({
-      success: true,
-      token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        phone: user.phone,
-        // Add any other non-sensitive user data you want to return
-      },
-    });
+        const verifyLink = `http://localhost:5000/api/auth/verify/${token}`;
+        await sendEmail(user.email, "Verify Your Account", `Please click the following link to verify your account: <a href="${verifyLink}">Verify Account</a>`);
+
+        // Save the verification token to the user document
+        user.verificationToken = token;
+        await user.save();
+
+        //verification email sent response
+        return res.status(200).json({
+          success: false,
+          message: "Verification email sent. Please check your inbox.",
+        });
 
   } catch (error) {
     console.error('Login error:', error);

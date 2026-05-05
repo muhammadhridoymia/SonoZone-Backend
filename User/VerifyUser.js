@@ -1,10 +1,10 @@
 import User from '../models/User.js';
-
+import jwt from "jsonwebtoken";
 
 export const verifyUser = async (req, res) => {
-  const { token } = req.params;
+  const { code } = req.params;
 
-  const user = await User.findOne({ verificationToken: token });
+  const user = await User.findOne({ verificationToken: code });
 
   if (!user) {
     return res.status(400).json({
@@ -13,13 +13,22 @@ export const verifyUser = async (req, res) => {
     });
   }
 
+  //1. verify user
   user.isVerified = true;
   user.verificationToken = undefined;
-
   await user.save();
 
-  res.json({
+  // 2. create JWT
+  const jwtToken = jwt.sign(
+    { id: user._id },
+    process.env.JWT_SECRET,
+    { expiresIn: "7d" }
+  );
+
+  // 3. send response with token and user info
+  res.status(200).json({
     success: true,
-    message: "Account verified successfully"
-  });
+    token: jwtToken,
+    user: { name: user.name }
+    });
 };

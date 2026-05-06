@@ -1,20 +1,23 @@
-import User from '../models/User.js';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import User from "../models/User.js";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import { sendEmail } from "../utils/SendEmail.js";
+import { EmailTemplate } from "../utils/EmailTemplate.js";
 
 export const register = async (req, res) => {
   try {
-    const { name,email, phone, password, } = req.body;
-    console.log('Registration request body:', req.body);
+    const { name, email, password } = req.body;
+    console.log("Registration request body:", req.body);
 
     // Validation
     if (!password) {
-      return res.status(400).json({ message: 'Password is required' });
+      return res.status(201).json({ verify: false, message: "Password is required" });
     }
 
-    if (!email && !phone) {
-      return res.status(400).json({ 
-        message: 'Either email or phone number is required' 
+    if (!email) {
+      return res.status(201).json({
+        verify: false,
+        message: "Email is required",
       });
     }
 
@@ -24,14 +27,9 @@ export const register = async (req, res) => {
     if (email) {
       existingUser = await User.findOne({ email: email.toLowerCase() });
       if (existingUser) {
-        return res.status(409).json({ message: 'User with this email already exists' });
-      }
-    }
-
-    if (phone) {
-      existingUser = await User.findOne({ phone });
-      if (existingUser) {
-        return res.status(409).json({ message: 'User with this phone number already exists' });
+        return res
+          .status(201)
+          .json({ verify: false, message: "User with this email already exists" });
       }
     }
 
@@ -39,34 +37,41 @@ export const register = async (req, res) => {
     const salt = await bcrypt.genSalt(12);
     const hashedPassword = await bcrypt.hash(password, salt);
 
+    // Generate a random 6-digit code
+    const generateVerificationCode = () => {
+      return Math.floor(100000 + Math.random() * 900000).toString();
+    };
+    const Code = generateVerificationCode();
+
+    // Send verification email
+    if (email) {
+      const emailContent = EmailTemplate(Code, name || "User");
+      await sendEmail(email, "Verify your account", emailContent);
+    }
     // Create new user
     const newUser = new User({
-      name: name || '',
+      name: name || "",
       email: email ? email.toLowerCase() : null,
-      phone: phone || null,
       password: hashedPassword,
+      verificationToken: Code,
       // You can add more fields like role, isVerified, etc.
     });
 
-    console.log('New user object before saving:', newUser);
+    console.log("New user object before saving:", newUser);
     await newUser.save();
 
-    // Generate JWT token
-    const token = jwt.sign( { userId: newUser._id },  process.env.JWT_SECRET, { expiresIn: '7d' });
-
-    // Send response with user info and token
-    res.status(201).json({
-      success: true,
-      token,
-      user: {name: newUser.name},
+    // Send successful registration response
+    res.status(200).json({
+      verify: true,
+      message:
+        "Registration successful! Please check your email to verify your account.",
     });
-
   } catch (error) {
-    console.error('Registration error:', error);
+    console.error("Registration error:", error);
     res.status(500).json({
-      success: false,
-      message: 'Server error during registration',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      verify: false,
+      message: "Server error during registration",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
     });
   }
 };

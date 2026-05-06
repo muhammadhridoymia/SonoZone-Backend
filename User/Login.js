@@ -6,7 +6,7 @@ import { EmailTemplate } from "../utils/EmailTemplate.js";
 
 export const login = async (req, res) => {
   try {
-    const { email, phone, password } = req.body;
+    const { email, password } = req.body;
     console.log("Login request body:", req.body);
 
     // Validation
@@ -17,24 +17,18 @@ export const login = async (req, res) => {
       });
     }
 
-    if (!email && !phone) {
+    if (!email) {
       return res.status(201).json({
         success: false,
-        message: "Either email or phone number is required",
+        message: "Email is required",
       });
     }
-    // Find user by email or phone
-    let user;
-
-    if (email) {
-      user = await User.findOne({ email: email.toLowerCase() });
-    } else if (phone) {
-      user = await User.findOne({ phone });
-    }
+    // Find user 
+    const user = await User.findOne({ email: email.toLowerCase() });
 
     // Check if user exists
     if (!user) {
-      console.log("User not found with email or phone:", email || phone);
+      console.log("User not found with this email:", email);
       return res.status(201).json({
         success: false,
         message: "User not found! try valid credentials or Register.",
@@ -53,7 +47,7 @@ export const login = async (req, res) => {
 
     // Generate JWT token
     const token = jwt.sign(
-      { userId: user._id, email: user.email, phone: user.phone },
+      { userId: user._id, email: user.email },
       process.env.JWT_SECRET,
       { expiresIn: "7d" },
     );

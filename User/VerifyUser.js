@@ -3,6 +3,16 @@ import jwt from "jsonwebtoken";
 
 export const verifyUser = async (req, res) => {
   const { code } = req.params;
+  console.log("Verification code received:", code);
+  
+  if (!code) {
+    return res.status(400).json({
+      success: false,
+      message: "Verification code is required"
+    });
+  }
+
+  // Find user by verification token
 
   const user = await User.findOne({ verificationToken: code });
 

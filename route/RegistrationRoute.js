@@ -7,6 +7,6 @@ const router = Router();
 
 router.post('/register', register);
 router.post('/login', login);
-router.get('/verify/:token', verifyUser);
+router.get('/verify/:code', verifyUser);
 
 module.exports = router;

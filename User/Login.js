@@ -11,14 +11,14 @@ export const login = async (req, res) => {
 
     // Validation
     if (!password) {
-      return res.status(201).json({
+      return res.status(400).json({
         success: false,
         message: "Password is required",
       });
     }
 
     if (!email) {
-      return res.status(201).json({
+      return res.status(400).json({
         success: false,
         message: "Email is required",
       });
@@ -29,7 +29,7 @@ export const login = async (req, res) => {
     // Check if user exists
     if (!user) {
       console.log("User not found with this email:", email);
-      return res.status(201).json({
+      return res.status(404).json({
         success: false,
         message: "User not found! try valid credentials or Register.",
       });
@@ -39,7 +39,7 @@ export const login = async (req, res) => {
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
-      return res.status(201).json({
+      return res.status(401).json({
         success: false,
         message: "Wrong password!",
       });

@@ -6,7 +6,7 @@ export const verifyUser = async (req, res) => {
   console.log("Verification code received:", code);
   
   if (!code) {
-    return res.status(201).json({
+    return res.status(400).json({
       success: false,
       message: "Verification code is required"
     });
@@ -17,7 +17,7 @@ export const verifyUser = async (req, res) => {
   const user = await User.findOne({ verificationToken: code });
 
   if (!user) {
-    return res.status(201).json({
+    return res.status(400).json({
       success: false,
       message: "Invalid token"
     });

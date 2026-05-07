@@ -11,11 +11,11 @@ export const register = async (req, res) => {
 
     // Validation
     if (!password) {
-      return res.status(201).json({ verify: false, message: "Password is required" });
+      return res.status(400).json({ verify: false, message: "Password is required" });
     }
 
     if (!email) {
-      return res.status(201).json({
+      return res.status(400).json({
         verify: false,
         message: "Email is required",
       });
@@ -28,7 +28,7 @@ export const register = async (req, res) => {
       existingUser = await User.findOne({ email: email.toLowerCase() });
       if (existingUser) {
         return res
-          .status(201)
+          .status(405)
           .json({ verify: false, message: "User with this email already exists" });
       }
     }
